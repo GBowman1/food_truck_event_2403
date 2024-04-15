@@ -1,3 +1,5 @@
+require 'date'
+
 class Event
     attr_reader :name, 
                 :food_trucks,

@@ -138,4 +138,54 @@ RSpec.describe Event do
             expect(@event.overstocked_items).to eq([@item1])
         end
     end
+
+    # describe '#start_date' do
+    #     it 'returns date of event in dd/mm/yyyy format' do
+    #         expect(@event.start_date).to eq("08-10-1998")
+    #         allow(@event).to receive(:start_date).and_return("08-10-1998")
+    #     end
+    # end
+
+    # come back to the stub thing later
+
+    describe '#sell' do
+        it 'returns true if event has enough of item and decreases stock of food truck' do
+            @event.add_food_truck(@food_truck1)
+            @event.add_food_truck(@food_truck2)
+            @event.add_food_truck(@food_truck3)
+
+            @food_truck1.stock(@item1, 35)
+            @food_truck1.stock(@item2, 7)
+
+            @food_truck2.stock(@item4, 50)
+            @food_truck2.stock(@item3, 25)
+
+            @food_truck3.stock(@item1, 65)
+
+            expect(@event.sell(@item1, 40)).to eq(true)
+            # there is enough stock should return true and decrease stock to 60
+            expect(@food_truck1.check_stock(@item1)).to eq(0)
+            expect(@food_truck3.check_stock(@item1)).to eq(60)
+            # priorotizes truck1 sells out then goes to truck 3
+        end
+
+        it 'returns false if event does not have enough of item' do
+            @event.add_food_truck(@food_truck1)
+            @event.add_food_truck(@food_truck2)
+            @event.add_food_truck(@food_truck3)
+
+            @food_truck1.stock(@item1, 35)
+            @food_truck1.stock(@item2, 7)
+
+            @food_truck2.stock(@item4, 50)
+            @food_truck2.stock(@item3, 25)
+
+            @food_truck3.stock(@item1, 65)
+
+            expect(@event.sell(@item1, 200)).to eq(false)
+            # there is not enough stock should return false
+            expect(@food_truck1.check_stock(@item1)).to eq(35)
+            expect(@food_truck3.check_stock(@item1)).to eq(65)
+        end
+    end
 end
