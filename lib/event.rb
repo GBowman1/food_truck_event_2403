@@ -50,7 +50,7 @@ class Event
             end
             # move our items from food_truck inventory to items array
         end
-        map_and_sort_items(items.uniq)
+        items = map_and_sort_items(items.uniq)
         # uniq removes duplicates then sort by name
     end
 
@@ -81,4 +81,27 @@ class Event
         end
     end
     # helper method to sum total quantity of items
+
+    def sell(item, quantity)
+        if total_quantity(item) >= quantity # check if we have enough stock for order
+            sell_stock(item, quantity)
+        else
+            false
+        end
+    end
+
+    def sell_stock(item, quantity)
+        @food_trucks.each do |food_truck|
+            if food_truck.check_stock(item) >= quantity
+                food_truck.inventory[item] -= quantity
+                return true
+            else
+                quantity -= food_truck.check_stock(item)
+                food_truck.inventory[item] = 0
+                # if truck 1 cant satisfy full order updates current truck to 0, moves to next truck with updated quanity that needs to be sold
+            end
+        end
+        # helper method
+        # iterate through trucks, sell items, return true if successful
+    end
 end
