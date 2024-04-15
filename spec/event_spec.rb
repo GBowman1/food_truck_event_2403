@@ -66,4 +66,76 @@ RSpec.describe Event do
             expect(@event.food_trucks_that_sell(@item4)).to eq([@food_truck2])
         end
     end
+
+    describe '#items_at_event' do
+        it 'returns all items at event in alphabetical list' do
+            @event.add_food_truck(@food_truck1)
+            @event.add_food_truck(@food_truck2)
+            @event.add_food_truck(@food_truck3)
+
+            @food_truck1.stock(@item1, 35)
+            @food_truck1.stock(@item2, 7)
+            @food_truck2.stock(@item4, 50)
+            @food_truck2.stock(@item3, 25)
+            @food_truck3.stock(@item1, 65)
+
+            expect(@event.items_at_event).to eq(["Apple Pie (Slice)", "Banana Nice Cream", "Peach Pie (Slice)", "Peach-Raspberry Nice Cream"])
+        end
+    end
+
+    describe '#total_inventory' do
+        it 'returns all items at event in hash with quantity and what truck sells it' do
+            @event.add_food_truck(@food_truck1)
+            @event.add_food_truck(@food_truck2)
+            @event.add_food_truck(@food_truck3)
+
+            @food_truck1.stock(@item1, 35)
+            @food_truck1.stock(@item2, 7)
+
+            @food_truck2.stock(@item4, 50)
+            @food_truck2.stock(@item3, 25)
+
+            @food_truck3.stock(@item1, 65)
+
+            expect(@event.total_inventory).to eq({
+                @item1 => {
+                    quantity: 100,
+                    food_trucks: [@food_truck1, @food_truck3]
+                },
+                @item2 => {
+                    quantity: 7,
+                    food_trucks: [@food_truck1]
+                },
+                @item3 => {
+                    quantity: 25,
+                    food_trucks: [@food_truck2]
+                },
+                @item4 => {
+                    quantity: 50,
+                    food_trucks: [@food_truck2]
+                }
+            })
+            # Yup now I feel like i'm making JavaScript objects
+        end
+    end
+
+    describe '#overstocked_items' do
+        it 'returns items that are sold by more than 1 truck and have more than 50 in stock' do
+            @event.add_food_truck(@food_truck1)
+            @event.add_food_truck(@food_truck2)
+            @event.add_food_truck(@food_truck3)
+
+            @food_truck1.stock(@item1, 35)
+            @food_truck1.stock(@item2, 7)
+
+            @food_truck2.stock(@item4, 50)
+            @food_truck2.stock(@item3, 25)
+
+            @food_truck3.stock(@item1, 65)
+
+            @event.check_overstock
+
+            expect(@event.overstocked_items).to eq([@item1])
+        end
+    end
 end
