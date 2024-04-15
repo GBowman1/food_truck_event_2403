@@ -57,7 +57,26 @@ class Event
             item.name
         end.sort
     end
+    # helper method to map and sort items
 
     def total_inventory
+        total_inventory = {}
+        @food_trucks.each do |food_truck|
+            food_truck.inventory.each do |item, quantity|
+                total_inventory[item] = { # do we want it to be item name or item object?
+                    quantity: total_quantity(item),
+                    food_trucks: food_trucks_that_sell(item)
+                }
+            end
+            # iterate through trucks, add items to total inventory hash
+        end
+        total_inventory
     end
+
+    def total_quantity(item)
+        @food_trucks.sum do |food_truck|
+            food_truck.check_stock(item)
+        end
+    end
+    # helper method to sum total quantity of items
 end
